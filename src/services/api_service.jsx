@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://74.162.36.205:5075";
+const API_BASE_URL = "http://74.162.36.205:5075/skillyfy";
 
 export async function apiGet(endpoint, headers = {}) {
     const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers });
