@@ -1,0 +1,11 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Avoid redirect loop: only redirect if HTTPS is on
+RewriteCond %{HTTPS} on
+
+# Redirect all HTTPS requests to HTTP
+RewriteRule ^ http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Optional: Ensure index.php or index.html loads by default
+DirectoryIndex index.html index.php
