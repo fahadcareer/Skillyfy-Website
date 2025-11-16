@@ -117,33 +117,61 @@ export default function LearningContentPage() {
                     </div>
 
                     {/* PAGE CONTENT */}
+                    {/* PAGE CONTENT */}
                     {selectedPage ? (
                         selectedPage.subtopics.map((sub, index) => (
                             <div
                                 key={index}
                                 className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8"
                             >
+                                {/* SUBTOPIC TITLE */}
                                 <h2 className="text-xl font-semibold text-gray-800 mb-4">
                                     {sub.subtitle}
                                 </h2>
 
-                                <p className="text-gray-700 leading-relaxed mb-6">
+                                {/* DESCRIPTION */}
+                                <p className="text-gray-700 leading-relaxed mb-6 whitespace-pre-line">
                                     {sub.description}
                                 </p>
 
-                                {/* Example Code */}
+                                {/* EXAMPLE SECTION */}
                                 {sub.example && (
-                                    <div className="bg-gray-900 text-white rounded-lg p-4 mb-6">
-                                        <pre className="text-sm overflow-x-auto">
-                                            <code>{sub.example.code}</code>
-                                        </pre>
-                                        <p className="text-gray-300 mt-2 text-sm">
-                                            💡 {sub.example.explanation}
-                                        </p>
+                                    <div className="mb-6">
+
+                                        {/* CODE BLOCK */}
+                                        <div className="bg-gray-900 text-white rounded-lg p-4">
+                                            <p className="font-semibold mb-2 text-green-300">Code:</p>
+                                            <pre className="text-sm overflow-x-auto">
+                                                <code>{sub.example.code}</code>
+                                            </pre>
+                                        </div>
+
+                                        {/* OUTPUT BLOCK */}
+                                        {sub.example.output && (
+                                            <div className="bg-black text-green-400 rounded-lg p-4 mt-4">
+                                                <p className="font-semibold mb-2">Output:</p>
+                                                <pre className="text-sm whitespace-pre-wrap">
+                                                    {sub.example.output}
+                                                </pre>
+                                            </div>
+                                        )}
+
+                                        {/* EXPLANATION POINTS */}
+                                        {sub.example.explanation_points &&
+                                            Array.isArray(sub.example.explanation_points) && (
+                                                <div className="mt-4">
+                                                    <p className="font-semibold text-gray-800">Explanation:</p>
+                                                    <ul className="list-disc ml-6 mt-2 text-gray-700">
+                                                        {sub.example.explanation_points.map((point, i) => (
+                                                            <li key={i}>{point}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                     </div>
                                 )}
 
-                                {/* Practice Section */}
+                                {/* PRACTICE SECTION */}
                                 {sub.practice && (
                                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                                         <p className="text-blue-700 text-sm font-medium">
