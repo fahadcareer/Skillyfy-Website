@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserCheck, Users, History, Loader2, User } from "lucide-react";
 import useAssessmentStore from "../../store/assessment-store/assessment-store";
+import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { generateAssessment, fetchPastAssessments, fetchAllAssessments, loading } =
         useAssessmentStore();
 
@@ -36,7 +38,7 @@ export default function Dashboard() {
 
     const handleSelfAssessment = async () => {
         if (!email) {
-            alert("No user email found. Please login again.");
+            alert(t("loginAgain"));
             navigate("/");
             return;
         }
@@ -48,7 +50,7 @@ export default function Dashboard() {
         }
 
         if (!userProfile) {
-            alert("Please complete your profile before taking assessments.");
+            alert(t("completeProfileWarning"));
             navigate("/complete-profile");
             return;
         }
@@ -64,7 +66,7 @@ export default function Dashboard() {
         if (success && data.length > 0) {
             navigate("/past-assessments", { state: { data } });
         } else {
-            alert(error || "No past assessments found.");
+            alert(error || t("noPastAssessments"));
         }
     };
 
@@ -73,28 +75,28 @@ export default function Dashboard() {
         if (success && data.length > 0) {
             navigate("/all-users-results", { state: { data } });
         } else {
-            alert(error || "No assessments found.");
+            alert(error || t("noAssessmentsFound"));
         }
     };
 
     const actions = [
         {
-            title: "Self Assessment",
-            description: "Evaluate your own skills and progress.",
+            title: t("selfAssessment"),
+            description: t("selfAssessmentDescription"),
             icon: <UserCheck size={28} className="text-blue-600" />,
             color: "from-blue-100 to-blue-50",
             onClick: handleSelfAssessment,
         },
         {
-            title: "All Users Results",
-            description: "View overall user performance and analytics.",
+            title: t("allUsersResults"),
+            description: t("allUsersResultsDescription"),
             icon: <Users size={28} className="text-purple-600" />,
             color: "from-purple-100 to-purple-50",
             onClick: handleAllUsersResults,
         },
         {
-            title: "Past Assessments",
-            description: "Review your previous assessments and history.",
+            title: t("pastAssessments"),
+            description: t("pastAssessmentsDescription"),
             icon: <History size={28} className="text-orange-600" />,
             color: "from-orange-100 to-orange-50",
             onClick: handlePastAssessments,
@@ -108,7 +110,7 @@ export default function Dashboard() {
                 flex flex-col items-center justify-center z-50">
                     <Loader2 className="animate-spin text-blue-600 w-10 h-10 mb-3" />
                     <p className="text-gray-700 font-medium">
-                        Processing your request...
+                        {t("processingRequest")}
                     </p>
                 </div>
             )}
@@ -117,7 +119,7 @@ export default function Dashboard() {
             <header className="bg-white shadow-sm border-b border-gray-100">
                 <div className="max-w-6xl mx-auto px-8 py-4 flex justify-between items-center">
                     <h1 className="text-2xl font-bold text-blue-600 tracking-tight">
-                        Skillyfy Dashboard
+                        {t("dashboardTitle")}
                     </h1>
 
                     <div className="flex items-center gap-4">
@@ -139,7 +141,7 @@ export default function Dashboard() {
                             className="px-4 py-2 bg-red-500 text-white text-sm font-medium 
                             rounded-lg hover:bg-red-600 transition"
                         >
-                            Logout
+                            {t("logout")}
                         </button>
                     </div>
                 </div>
@@ -149,14 +151,18 @@ export default function Dashboard() {
             <section className="max-w-6xl mx-auto w-full px-8 py-10">
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 
                 rounded-2xl p-10 text-white shadow-lg">
-                    <h2 className="text-3xl font-semibold mb-3">Welcome Back 👋</h2>
+                    <h2 className="text-3xl font-semibold mb-3">
+                        {t("welcomeBack")} 👋
+                    </h2>
 
                     {profile ? (
                         <p className="text-blue-100 text-lg">
-                            {profile.full_name}, explore your assessments and personalized learning path.
+                            {profile.full_name}, {t("welcomeSubtitle")}
                         </p>
                     ) : (
-                        <p className="text-blue-100 text-lg">Loading your profile...</p>
+                        <p className="text-blue-100 text-lg">
+                            {t("loadingProfile")}
+                        </p>
                     )}
                 </div>
             </section>
@@ -164,7 +170,7 @@ export default function Dashboard() {
             {/* QUICK ACTIONS */}
             <main className="flex-1 max-w-6xl mx-auto px-8 py-8">
                 <h3 className="text-xl font-semibold text-gray-800 mb-6">
-                    Quick Actions
+                    {t("quickActions")}
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -194,7 +200,7 @@ export default function Dashboard() {
 
             {/* FOOTER */}
             <footer className="text-center py-6 text-sm text-gray-500 border-t">
-                © {new Date().getFullYear()} Skillyfy — Empowering your learning journey.
+                © {new Date().getFullYear()} Skillyfy — {t("footerText")}
             </footer>
         </div>
     );

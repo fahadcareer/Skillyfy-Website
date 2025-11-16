@@ -2,10 +2,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import useEvaluationStore from "../../store/evaluation-store/evaluation-store";
+import { useTranslation } from "react-i18next";
 
 export default function AssessmentPage() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { t } = useTranslation();
+
     const { evaluateAssessment, loading, error } = useEvaluationStore();
     const [assessmentData] = useState(location.state?.data || null);
     const [responses, setResponses] = useState({});
@@ -18,7 +21,7 @@ export default function AssessmentPage() {
 
     const handleSubmit = async () => {
         if (!assessmentData?.assessment_id) {
-            alert("Invalid assessment data. Please retry.");
+            alert(t("invalidAssessmentData"));
             return;
         }
 
@@ -30,37 +33,37 @@ export default function AssessmentPage() {
         if (success) {
             navigate("/assessment-result", { state: { result: data } });
         } else {
-            alert(error || "Failed to evaluate responses.");
+            alert(error || t("evaluationFailed"));
         }
     };
 
     if (!assessmentData) {
         return (
             <div className="p-10 text-center text-gray-500">
-                No assessment data found. Please try again.
+                {t("noAssessmentDataFound")}
             </div>
         );
     }
 
     return (
         <div className="min-h-screen bg-gray-50 p-6 flex flex-col items-center relative">
-            {/* Full-page loading overlay */}
+            {/* Loading Overlay */}
             {loading && (
                 <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center z-50">
                     <Loader2 className="animate-spin text-blue-600 w-10 h-10 mb-3" />
-                    <p className="text-gray-700 font-medium">Evaluating your answers...</p>
+                    <p className="text-gray-700 font-medium">{t("evaluatingAnswers")}...</p>
                 </div>
             )}
 
             {/* Header */}
             <div className="max-w-4xl w-full mb-6">
-                <h2 className="text-3xl font-bold text-blue-600 mb-2">🧠 Self Assessment</h2>
+                <h2 className="text-3xl font-bold text-blue-600 mb-2">🧠 {t("selfAssessment")}</h2>
                 <p className="text-gray-500 mb-2">
-                    Answer each question carefully to receive personalized insights.
+                    {t("answerCarefully")}
                 </p>
 
                 <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2 text-sm text-blue-700">
-                    Total Questions: {questions.length || 0}
+                    {t("totalQuestions")}: {questions.length || 0}
                 </div>
             </div>
 
@@ -71,8 +74,9 @@ export default function AssessmentPage() {
                         <h3 className="text-lg font-semibold text-gray-800 mb-2">
                             {idx + 1}. {q.question}
                         </h3>
+
                         <p className="text-sm text-gray-500 mb-3">
-                            Domain: {q.domain} | Level: {q.level} | Type: {q.type}
+                            {t("domain")}: {q.domain} | {t("level")}: {q.level} | {t("type")}: {q.type}
                         </p>
 
                         {q.type === "mcq" ? (
@@ -100,7 +104,7 @@ export default function AssessmentPage() {
                         ) : (
                             <textarea
                                 rows="4"
-                                placeholder="Type your answer..."
+                                placeholder={t("typeYourAnswer")}
                                 className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 value={responses[q.id] || ""}
                                 onChange={(e) => handleOptionSelect(q.id, e.target.value)}
@@ -109,10 +113,10 @@ export default function AssessmentPage() {
                     </div>
                 ))}
 
-                {/* Empty fallback */}
+                {/* Empty Fallback */}
                 {questions.length === 0 && !loading && (
                     <div className="text-center text-gray-500 py-10">
-                        No questions available. Please regenerate assessment.
+                        {t("noQuestionsAvailable")}
                     </div>
                 )}
 
@@ -121,24 +125,22 @@ export default function AssessmentPage() {
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className={`mt-8 w-full py-3 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition ${loading
-                            ? "bg-blue-400 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700"
+                        className={`mt-8 w-full py-3 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
                             }`}
                     >
                         {loading ? (
                             <>
                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                Submitting...
+                                {t("submitting")}...
                             </>
                         ) : (
-                            "Submit Assessment"
+                            t("submitAssessment")
                         )}
                     </button>
                 )}
             </div>
 
-            {/* Error Message */}
+            {/* Error */}
             {error && (
                 <div className="mt-4 text-red-600 text-sm bg-red-50 px-4 py-2 rounded-lg border border-red-200">
                     ⚠️ {error}

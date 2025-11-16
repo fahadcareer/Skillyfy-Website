@@ -2,10 +2,13 @@ import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/auth-store/auth-store";
+import { useTranslation } from "react-i18next";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const { login, loading, error } = useAuthStore();
+    const { t } = useTranslation();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -17,21 +20,22 @@ export default function LoginPage() {
             alert(error);
             return;
         }
+
         try {
-            const res = await fetch(`https://meerana-ai.uaenorth.cloudapp.azure.com/skillyfy/profile/${email}`);
+            const res = await fetch(
+                `https://meerana-ai.uaenorth.cloudapp.azure.com/skillyfy/profile/${email}`
+            );
 
             if (res.status === 404) {
                 navigate("/complete-profile");
             } else {
                 navigate("/dashboard");
             }
-
         } catch (err) {
             console.error("Profile check failed:", err);
             navigate("/dashboard");
         }
     };
-
 
     return (
         <div className="flex min-h-screen">
@@ -43,13 +47,17 @@ export default function LoginPage() {
                         alt="Skillyfy Logo"
                         className="w-20 h-20 mx-auto mb-6 drop-shadow-md"
                     />
-                    <div className="text-5xl font-bold mb-4">Hello Skillyfy! 👋</div>
+
+                    <div className="text-5xl font-bold mb-4">
+                        {t("helloSkillyfy")}
+                    </div>
+
                     <p className="text-lg opacity-90 mb-8">
-                        Skip repetitive manual tasks. Be highly productive through
-                        automation and save tons of time!
+                        {t("loginLeftSubtitle")}
                     </p>
+
                     <p className="text-sm opacity-70">
-                        © {new Date().getFullYear()} Skillyfy. All rights reserved.
+                        © {new Date().getFullYear()} Skillyfy. {t("allRightsReserved")}
                     </p>
                 </div>
             </div>
@@ -57,21 +65,26 @@ export default function LoginPage() {
             {/* RIGHT PANEL */}
             <div className="flex w-full md:w-1/2 justify-center items-center bg-white px-8">
                 <div className="w-full max-w-sm">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
+                    <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                        {t("welcomeBack")}
+                    </h2>
+
                     <p className="text-sm text-gray-500 mb-6">
-                        Don’t have an account?{" "}
+                        {t("dontHaveAccount")}{" "}
                         <a href="#" className="text-indigo-600 font-medium hover:underline">
-                            Create a new account now
+                            {t("createAccount")}
                         </a>
-                        , it’s free!
+                        , {t("itsFree")}
                     </p>
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label className="text-sm text-gray-600 mb-1 block">Email</label>
+                            <label className="text-sm text-gray-600 mb-1 block">
+                                {t("email")}
+                            </label>
                             <input
                                 type="email"
-                                placeholder="Enter your email"
+                                placeholder={t("enterEmail")}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -80,10 +93,12 @@ export default function LoginPage() {
                         </div>
 
                         <div>
-                            <label className="text-sm text-gray-600 mb-1 block">Password</label>
+                            <label className="text-sm text-gray-600 mb-1 block">
+                                {t("password")}
+                            </label>
                             <input
                                 type="password"
-                                placeholder="Enter your password"
+                                placeholder={t("enterPassword")}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
@@ -103,7 +118,7 @@ export default function LoginPage() {
                             className={`w-full bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition-all ${loading ? "opacity-70 cursor-not-allowed" : ""
                                 }`}
                         >
-                            {loading ? "Logging in..." : "Login Now"}
+                            {loading ? t("loggingIn") : t("loginNow")}
                         </button>
 
                         <button
@@ -111,14 +126,14 @@ export default function LoginPage() {
                             className="w-full flex justify-center items-center gap-3 border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition"
                         >
                             <FcGoogle className="text-xl" />
-                            <span>Login with Google</span>
+                            <span>{t("loginWithGoogle")}</span>
                         </button>
                     </form>
 
                     <p className="text-sm text-gray-500 mt-6 text-center">
-                        Forgot password?{" "}
+                        {t("forgotPassword")}{" "}
                         <a href="#" className="text-indigo-600 hover:underline">
-                            Click here
+                            {t("clickHere")}
                         </a>
                     </p>
                 </div>

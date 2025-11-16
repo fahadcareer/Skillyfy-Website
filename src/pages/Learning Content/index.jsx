@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Loader2, ArrowLeft, BookOpen } from "lucide-react";
 import useLearningStore from "../../store/learning-store/learning-store";
+import { useTranslation } from "react-i18next";
 
 export default function LearningContentPage() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { t } = useTranslation();
+
     const topic = location.state?.topic;
     const email = localStorage.getItem("user_email");
 
@@ -17,6 +20,7 @@ export default function LearningContentPage() {
             if (!topic) return;
 
             const { success, data } = await generateLearningContent(topic, { email });
+
             if (success && data?.pages?.length) {
                 setSelectedPage(data.pages[0]);
             }
@@ -25,15 +29,17 @@ export default function LearningContentPage() {
         fetchContent();
     }, [topic, email]);
 
+    /** LOADING VIEW */
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col justify-center items-center text-gray-500">
                 <Loader2 className="animate-spin text-blue-600 w-10 h-10 mb-3" />
-                <p>Generating detailed learning content...</p>
+                <p>{t("generatingLearningContent")}</p>
             </div>
         );
     }
 
+    /** ERROR VIEW */
     if (error) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center text-center px-6">
@@ -43,23 +49,24 @@ export default function LearningContentPage() {
                     onClick={() => navigate(-1)}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
-                    Go Back
+                    {t("goBack")}
                 </button>
             </div>
         );
     }
 
+    /** EMPTY VIEW */
     if (!content) {
         return (
             <div className="min-h-screen flex items-center justify-center text-gray-500">
-                No content available. Please try again.
+                {t("noContentAvailable")}
             </div>
         );
     }
 
     return (
         <div className="min-h-screen flex bg-gray-50">
-            {/* Sidebar */}
+            {/* SIDEBAR */}
             <aside className="w-72 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen sticky top-0">
                 <div className="p-4 border-b flex items-center justify-between">
                     <h2 className="text-lg font-bold text-blue-600 truncate">
@@ -67,7 +74,7 @@ export default function LearningContentPage() {
                     </h2>
                 </div>
 
-                {/* Sidebar Scroll Area */}
+                {/* Sidebar Scroll */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
                     {content.pages.map((page, pIndex) => (
                         <div
@@ -84,24 +91,26 @@ export default function LearningContentPage() {
                 </div>
             </aside>
 
-            {/* Main Content */}
+            {/* MAIN CONTENT */}
             <main className="flex-1 h-screen overflow-y-auto p-8">
                 <div className="max-w-4xl mx-auto">
-                    {/* Header */}
+                    {/* HEADER */}
                     <div className="flex items-center justify-between mb-8">
                         <button
                             onClick={() => navigate(-1)}
                             className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition"
                         >
-                            <ArrowLeft size={18} /> Back
+                            <ArrowLeft size={18} /> {t("back")}
                         </button>
+
                         <h1 className="text-2xl font-bold text-blue-600">
-                            {selectedPage?.title || "Learning Content"}
+                            {selectedPage?.title || t("learningContent")}
                         </h1>
+
                         <div />
                     </div>
 
-                    {/* Page Content */}
+                    {/* PAGE CONTENT */}
                     {selectedPage ? (
                         selectedPage.subtopics.map((sub, index) => (
                             <div
@@ -111,6 +120,7 @@ export default function LearningContentPage() {
                                 <h2 className="text-xl font-semibold text-gray-800 mb-4">
                                     {sub.subtitle}
                                 </h2>
+
                                 <p className="text-gray-700 leading-relaxed mb-6">
                                     {sub.description}
                                 </p>
@@ -131,7 +141,7 @@ export default function LearningContentPage() {
                                 {sub.practice && (
                                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                                         <p className="text-blue-700 text-sm font-medium">
-                                            🧠 <strong>Practice:</strong> {sub.practice}
+                                            🧠 <strong>{t("practice")}:</strong> {sub.practice}
                                         </p>
                                     </div>
                                 )}
@@ -139,7 +149,7 @@ export default function LearningContentPage() {
                         ))
                     ) : (
                         <div className="text-gray-500 text-center py-20">
-                            Select a page to view its learning materials
+                            {t("selectPageToViewContent")}
                         </div>
                     )}
                 </div>

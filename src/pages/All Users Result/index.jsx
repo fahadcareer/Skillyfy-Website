@@ -2,10 +2,13 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Loader2, User, Calendar, RefreshCw, AlertCircle } from "lucide-react";
 import useAllUsersStore from "../../store/all-users-store/all-users-store";
+import { useTranslation } from "react-i18next";
 
 export default function AllUsersResultsPage() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { t } = useTranslation();
+
     const { assessments, fetchAllAssessments, loading, error } = useAllUsersStore();
 
     useEffect(() => {
@@ -36,7 +39,7 @@ export default function AllUsersResultsPage() {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center text-gray-600">
                 <Loader2 className="w-8 h-8 animate-spin mb-3 text-blue-600" />
-                Loading assessments...
+                {t("loadingAssessments")}
             </div>
         );
     }
@@ -50,7 +53,7 @@ export default function AllUsersResultsPage() {
                     onClick={fetchAllAssessments}
                     className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
                 >
-                    <RefreshCw size={16} /> Retry
+                    <RefreshCw size={16} /> {t("retry")}
                 </button>
             </div>
         );
@@ -60,7 +63,7 @@ export default function AllUsersResultsPage() {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center text-gray-500">
                 <User className="w-10 h-10 mb-3 text-gray-400" />
-                <p>No assessments found.</p>
+                <p>{t("noAssessmentsFound")}</p>
             </div>
         );
     }
@@ -68,14 +71,18 @@ export default function AllUsersResultsPage() {
     return (
         <div className="min-h-screen bg-gray-50 p-8">
             <div className="max-w-5xl mx-auto">
+
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-2xl font-bold text-blue-600">📊 All Users Assessments</h2>
+                    <h2 className="text-2xl font-bold text-blue-600">
+                        📊 {t("allUsersAssessments")}
+                    </h2>
+
                     <button
                         onClick={() => navigate("/dashboard")}
                         className="text-sm px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition"
                     >
-                        Back to Dashboard
+                        {t("backToDashboard")}
                     </button>
                 </div>
 
@@ -89,7 +96,9 @@ export default function AllUsersResultsPage() {
                         return (
                             <div
                                 key={index}
-                                onClick={() => navigate("/assessment-detail", { state: { data: item } })}
+                                onClick={() =>
+                                    navigate("/assessment-detail", { state: { data: item } })
+                                }
                                 className="bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 p-6 cursor-pointer transition transform hover:-translate-y-1"
                             >
                                 <div className="flex items-center gap-4 mb-4">
@@ -98,9 +107,11 @@ export default function AllUsersResultsPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-gray-800 text-lg">
-                                            {user.full_name || "Unknown User"}
+                                            {user.full_name || t("unknownUser")}
                                         </h3>
-                                        <p className="text-sm text-gray-500">{user.current_role || "No role"}</p>
+                                        <p className="text-sm text-gray-500">
+                                            {user.current_role || t("noRole")}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -113,6 +124,7 @@ export default function AllUsersResultsPage() {
                                     >
                                         {score}/{total}
                                     </div>
+
                                     <span className="text-xs text-gray-400 flex items-center gap-1">
                                         <Calendar size={14} />
                                         {formatDate(item.created_at)}
@@ -122,6 +134,7 @@ export default function AllUsersResultsPage() {
                         );
                     })}
                 </div>
+
             </div>
         </div>
     );

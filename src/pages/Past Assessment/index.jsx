@@ -12,10 +12,12 @@ import {
     CalendarDays,
 } from "lucide-react";
 import usePastAssessmentsStore from "../../store/past-assessments-store/past-assessments-store";
+import { useTranslation } from "react-i18next";
 
 export default function PastAssessmentsPage() {
     const navigate = useNavigate();
     const email = localStorage.getItem("user_email");
+    const { t } = useTranslation();
 
     const { assessments, fetchPastAssessments, loading, error } = usePastAssessmentsStore();
 
@@ -27,10 +29,12 @@ export default function PastAssessmentsPage() {
         const date = new Date(dateString);
         const now = new Date();
         const diff = Math.floor((now - date) / 1000);
-        if (diff < 60) return "Just now";
-        if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)} hr ago`;
-        if (diff < 2592000) return `${Math.floor(diff / 86400)} days ago`;
+
+        if (diff < 60) return t("justNow");
+        if (diff < 3600) return t("minutesAgo", { count: Math.floor(diff / 60) });
+        if (diff < 86400) return t("hoursAgo", { count: Math.floor(diff / 3600) });
+        if (diff < 2592000) return t("daysAgo", { count: Math.floor(diff / 86400) });
+
         return date.toLocaleDateString();
     };
 
@@ -44,125 +48,144 @@ export default function PastAssessmentsPage() {
 
     const getStatusIcon = (status) => {
         const lower = status?.toLowerCase() || "";
-        if (lower === "completed") return <CheckCircle className="text-green-600" size={20} />;
-        if (lower === "in_progress") return <Clock className="text-blue-500" size={20} />;
-        if (lower === "failed") return <XCircle className="text-red-500" size={20} />;
+        if (lower === "completed")
+            return <CheckCircle className="text-green-600" size={20} />;
+        if (lower === "in_progress")
+            return <Clock className="text-blue-500" size={20} />;
+        if (lower === "failed")
+            return <XCircle className="text-red-500" size={20} />;
         return <AlertCircle className="text-gray-500" size={20} />;
     };
 
-    // 🕒 Loading State
+    /** LOADING */
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center text-gray-600">
                 <Loader2 className="animate-spin w-10 h-10 mb-4 text-blue-600" />
-                <p>Loading assessments...</p>
+                <p>{t("loadingAssessments")}</p>
             </div>
         );
     }
 
-    // ❌ Error State
+    /** ERROR */
     if (error) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
                 <AlertCircle className="w-12 h-12 text-red-500 mb-3" />
-                <h2 className="text-lg font-semibold mb-2">Oops! Something went wrong</h2>
+                <h2 className="text-lg font-semibold mb-2">{t("errorOccurred")}</h2>
                 <p className="text-gray-500 mb-4">{error}</p>
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
-                    <ArrowLeft size={16} /> Go Back
+                    <ArrowLeft size={16} /> {t("goBack")}
                 </button>
             </div>
         );
     }
 
-    // 🫙 Empty State
+    /** EMPTY */
     if (assessments.length === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
                 <ClipboardList className="w-16 h-16 text-blue-400 mb-4" />
-                <h2 className="text-lg font-semibold mb-2 text-gray-800">No Assessments Yet</h2>
+                <h2 className="text-lg font-semibold mb-2 text-gray-800">
+                    {t("noAssessments")}
+                </h2>
                 <p className="text-gray-500 mb-4 max-w-md">
-                    Take your first assessment to see your progress and growth here.
+                    {t("takeFirstAssessment")}
                 </p>
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
-                    <ArrowLeft size={16} /> Go Back
+                    <ArrowLeft size={16} /> {t("goBack")}
                 </button>
             </div>
         );
     }
 
-    // ✅ Main UI
+    /** MAIN UI */
     return (
         <div className="min-h-screen bg-gray-50 py-10 px-6 flex flex-col items-center">
-            {/* Header */}
+            {/* HEADER */}
             <div className="max-w-5xl w-full mb-6 flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-blue-600 flex items-center gap-2">
-                    <ClipboardList className="text-blue-500" /> Past Assessments
+                    <ClipboardList className="text-blue-500" /> {t("pastAssessments")}
                 </h1>
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition"
                 >
-                    <ArrowLeft size={20} /> Back
+                    <ArrowLeft size={20} /> {t("back")}
                 </button>
             </div>
 
-            {/* Assessments List */}
+            {/* LIST */}
             <div className="max-w-5xl w-full space-y-4">
                 {assessments.map((item, index) => {
                     const percentage =
                         item.total_questions > 0
                             ? Math.round((item.score / item.total_questions) * 100)
                             : 0;
+
                     const scoreColor = getScoreColor(item.score, item.total_questions);
 
                     return (
                         <div
                             key={index}
-                            onClick={() => navigate("/assessment-detail", { state: { data: item } })}
+                            onClick={() =>
+                                navigate("/assessment-detail", { state: { data: item } })
+                            }
                             className="bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 p-6 cursor-pointer transition transform hover:-translate-y-1"
                         >
                             <div className="flex justify-between items-center mb-3">
                                 <div className="flex items-center gap-3">
                                     <div
-                                        className={`p-3 rounded-xl bg-opacity-10 ${scoreColor.replace("text", "bg")}`}
+                                        className={`p-3 rounded-xl bg-opacity-10 ${scoreColor.replace(
+                                            "text",
+                                            "bg"
+                                        )}`}
                                     >
-                                        <ClipboardList className={`${scoreColor}`} size={22} />
+                                        <ClipboardList className={scoreColor} size={22} />
                                     </div>
+
                                     <div>
                                         <h3 className="font-semibold text-gray-800 text-base">
-                                            Assessment #{item.assessment_id?.substring(0, 8)?.toUpperCase() || index + 1}
+                                            {t("assessmentNumber", {
+                                                num:
+                                                    item.assessment_id?.substring(0, 8)?.toUpperCase() ||
+                                                    index + 1,
+                                            })}
                                         </h3>
                                         <p className="text-sm text-gray-500 flex items-center gap-1">
                                             <CalendarDays size={14} />
-                                            {new Date(item.created_at).toLocaleDateString()} • {getTimeAgo(item.created_at)}
+                                            {new Date(item.created_at).toLocaleDateString()} •{" "}
+                                            {getTimeAgo(item.created_at)}
                                         </p>
                                     </div>
                                 </div>
+
                                 <ChevronRight className="text-gray-400" size={20} />
                             </div>
 
-                            {/* Score Stats */}
+                            {/* STATS */}
                             <div className="grid grid-cols-3 text-center border-t pt-4">
                                 <div>
-                                    <p className="text-sm text-gray-500">Score</p>
+                                    <p className="text-sm text-gray-500">{t("score")}</p>
                                     <p className={`font-semibold ${scoreColor}`}>
                                         {item.score}/{item.total_questions}
                                     </p>
                                 </div>
                                 <div className="border-x">
-                                    <p className="text-sm text-gray-500">Percentage</p>
+                                    <p className="text-sm text-gray-500">{t("percentage")}</p>
                                     <p className={`font-semibold ${scoreColor}`}>{percentage}%</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Status</p>
+                                    <p className="text-sm text-gray-500">{t("status")}</p>
                                     <div className="flex items-center justify-center gap-1 font-medium text-gray-700">
-                                        {getStatusIcon(item.status)} {item.status || "Completed"}
+                                        {getStatusIcon(item.status)}{" "}
+                                        {t(item.status || "completed")}
                                     </div>
                                 </div>
                             </div>

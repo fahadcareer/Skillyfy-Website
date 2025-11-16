@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "../../utils/axios";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function EditProfilePage() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const email = localStorage.getItem("user_email");
 
     const [form, setForm] = useState({
@@ -35,11 +37,11 @@ export default function EditProfilePage() {
     const handleSubmit = async () => {
         try {
             await axios.post("/profile", { ...form, email });
-            alert("Profile updated successfully!");
+            alert(t("profileUpdated"));
             navigate("/profile");
         } catch (error) {
             console.error(error);
-            alert("Update failed.");
+            alert(t("updateFailed"));
         }
     };
 
@@ -54,19 +56,18 @@ export default function EditProfilePage() {
                 {/* Header */}
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold text-gray-800">
-                        Edit Your Profile
+                        {t("editYourProfile")}
                     </h2>
                     <p className="text-gray-500 text-sm mt-1">
-                        Update your personal details and professional background.
+                        {t("updatePersonalDetails")}
                     </p>
                 </div>
 
                 {/* Form Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                     {/* Full Name */}
                     <div>
-                        <label className="text-gray-600 font-medium">Full Name</label>
+                        <label className="text-gray-600 font-medium">{t("fullName")}</label>
                         <input
                             type="text"
                             className="mt-1 w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -77,7 +78,7 @@ export default function EditProfilePage() {
 
                     {/* Current Role */}
                     <div>
-                        <label className="text-gray-600 font-medium">Current Role</label>
+                        <label className="text-gray-600 font-medium">{t("currentRole")}</label>
                         <input
                             type="text"
                             className="mt-1 w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -88,7 +89,7 @@ export default function EditProfilePage() {
 
                     {/* Years of Experience */}
                     <div>
-                        <label className="text-gray-600 font-medium">Years of Experience</label>
+                        <label className="text-gray-600 font-medium">{t("yearsOfExperience")}</label>
                         <input
                             type="number"
                             className="mt-1 w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -99,7 +100,7 @@ export default function EditProfilePage() {
 
                     {/* Education */}
                     <div>
-                        <label className="text-gray-600 font-medium">Education</label>
+                        <label className="text-gray-600 font-medium">{t("education")}</label>
                         <input
                             type="text"
                             className="mt-1 w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -110,7 +111,7 @@ export default function EditProfilePage() {
 
                     {/* Industry */}
                     <div>
-                        <label className="text-gray-600 font-medium">Industry</label>
+                        <label className="text-gray-600 font-medium">{t("industry")}</label>
                         <input
                             type="text"
                             className="mt-1 w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -121,7 +122,7 @@ export default function EditProfilePage() {
 
                     {/* Key Skills */}
                     <div>
-                        <label className="text-gray-600 font-medium">Key Skills</label>
+                        <label className="text-gray-600 font-medium">{t("keySkills")}</label>
                         <input
                             type="text"
                             className="mt-1 w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -133,7 +134,7 @@ export default function EditProfilePage() {
 
                 {/* Career Goals */}
                 <div className="mt-6">
-                    <label className="text-gray-600 font-medium">Career Goals</label>
+                    <label className="text-gray-600 font-medium">{t("careerGoals")}</label>
                     <textarea
                         className="mt-1 w-full p-3 border rounded-lg bg-gray-50 h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         value={form.career_goals}
@@ -147,13 +148,14 @@ export default function EditProfilePage() {
                         onClick={() => navigate("/profile")}
                         className="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
                     >
-                        Cancel
+                        {t("cancel")}
                     </button>
+
                     <button
                         onClick={handleSubmit}
                         className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                     >
-                        Save Changes
+                        {t("saveChanges")}
                     </button>
                 </div>
 
