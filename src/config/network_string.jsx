@@ -12,3 +12,7 @@ export const ASSESSMENT_NETWORK_URLS = {
 export const LEARNING_NETWORK_URLS = {
     GenerateLearningContent: "/generate-learning-content",
 };
+
+export const PROFILE_NETWORK_URLS = {
+    GetUserProfile: "/profile",
+};

@@ -12,9 +12,26 @@ export default function LoginPage() {
     const handleLogin = async (e) => {
         e.preventDefault();
         const { success, error } = await login(email, password);
-        if (success) navigate("/dashboard");
-        else alert(error);
+
+        if (!success) {
+            alert(error);
+            return;
+        }
+        try {
+            const res = await fetch(`https://meerana-ai.uaenorth.cloudapp.azure.com/skillyfy/profile/${email}`);
+
+            if (res.status === 404) {
+                navigate("/complete-profile");
+            } else {
+                navigate("/dashboard");
+            }
+
+        } catch (err) {
+            console.error("Profile check failed:", err);
+            navigate("/dashboard");
+        }
     };
+
 
     return (
         <div className="flex min-h-screen">

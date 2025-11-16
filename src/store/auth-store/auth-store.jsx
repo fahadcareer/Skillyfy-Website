@@ -6,7 +6,8 @@ const extractErrorMessage = (err) =>
     err?.message || "Something went wrong. Please try again.";
 
 const useAuthStore = create((set) => ({
-    token: null,
+    token: localStorage.getItem("token") || null,
+    email: localStorage.getItem("user_email") || null,
     loading: false,
     error: null,
 
@@ -18,10 +19,12 @@ const useAuthStore = create((set) => ({
             if (res.token) {
                 localStorage.setItem("token", res.token);
                 localStorage.setItem("user_email", email);
+                set({ token: res.token, email });
             }
 
-            set({ token: res.token || null, loading: false });
+            set({ loading: false });
             return { success: true, data: res };
+
         } catch (err) {
             const errorMsg = extractErrorMessage(err);
             set({ error: errorMsg, loading: false });
@@ -31,8 +34,9 @@ const useAuthStore = create((set) => ({
 
     logout: () => {
         localStorage.clear();
-        set({ token: null, error: null });
-    },
+        set({ token: null, email: null, error: null });
+    }
 }));
+
 
 export default useAuthStore;
