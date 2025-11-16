@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Loader2, ArrowLeft, BookOpen } from "lucide-react";
 import useLearningStore from "../../store/learning-store/learning-store";
@@ -14,6 +14,7 @@ export default function LearningContentPage() {
 
     const { content, loading, error, generateLearningContent } = useLearningStore();
     const [selectedPage, setSelectedPage] = useState(null);
+    const mainRef = useRef(null);
 
     useEffect(() => {
         const fetchContent = async () => {
@@ -28,6 +29,11 @@ export default function LearningContentPage() {
 
         fetchContent();
     }, [topic, email]);
+    useEffect(() => {
+        if (mainRef.current) {
+            mainRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    }, [selectedPage]);
 
     /** LOADING VIEW */
     if (loading) {
@@ -92,7 +98,7 @@ export default function LearningContentPage() {
             </aside>
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 h-screen overflow-y-auto p-8">
+            <main ref={mainRef} className="flex-1 h-screen overflow-y-auto p-8">
                 <div className="max-w-4xl mx-auto">
                     {/* HEADER */}
                     <div className="flex items-center justify-between mb-8">
