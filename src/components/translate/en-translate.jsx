@@ -156,4 +156,6 @@ export default {
     completed: "Completed",
     in_progress: "In Progress",
     failed: "Failed",
+    fullLearningRoadmap: "Full Learning Roadmap",
+    viewFullRoadmap: "View Full Roadmap"
 };

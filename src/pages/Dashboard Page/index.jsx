@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserCheck, Users, History, Loader2, User } from "lucide-react";
+import { UserCheck, Users, History, Loader2, User, Brain } from "lucide-react";
 import useAssessmentStore from "../../store/assessment-store/assessment-store";
 import { useTranslation } from "react-i18next";
 
@@ -101,6 +101,14 @@ export default function Dashboard() {
             color: "from-orange-100 to-orange-50",
             onClick: handlePastAssessments,
         },
+        {
+            title: "Personalized Learning",
+            description: "Upload a document and learn it your way",
+            icon: <Brain size={28} className="text-green-600" />,
+            color: "from-green-100 to-green-50",
+            onClick: () => navigate("/personalize-learning"),
+        }
+
     ];
 
     return (

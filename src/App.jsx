@@ -12,6 +12,9 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PublicRoute from "./components/PublicRoute.jsx";
 import ProfilePage from "./pages/Profile Page/index.jsx";
 import EditProfilePage from "./pages/Edit Profile Page/index.jsx";
+import LearningRoadmapPage from "./pages/LearningRoadmapPage/index.jsx";
+import PersonalizeLearning from "./pages/PersonalizeLearning/index.jsx";
+import PersonalizedResultPage from "./pages/PersonalizedResultPage/index.jsx";
 
 export default function App() {
   return (
@@ -115,8 +118,30 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
-
+        <Route
+          path="/learning-roadmap"
+          element={
+            <ProtectedRoute>
+              <LearningRoadmapPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/personalize-learning"
+          element={
+            <ProtectedRoute>
+              <PersonalizeLearning />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/personalized-result"
+          element={
+            <ProtectedRoute>
+              <PersonalizedResultPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
