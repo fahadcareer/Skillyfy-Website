@@ -71,7 +71,7 @@ export default function PersonalizeLearning() {
 
         try {
             const res = await fetch(
-                "http://192.168.31.208:5075/skillyfy/personalize-learning",
+                "https://meerana-ai.uaenorth.cloudapp.azure.com/skillyfy/personalize-learning",
                 {
                     method: "POST",
                     body: formData,

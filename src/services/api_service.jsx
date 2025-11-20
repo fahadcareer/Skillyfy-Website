@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://192.168.31.208:5075/skillyfy";
+const API_BASE_URL = "https://meerana-ai.uaenorth.cloudapp.azure.com/skillyfy";
 
 export async function apiGet(endpoint, headers = {}) {
     const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers });
