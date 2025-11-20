@@ -6,26 +6,67 @@ import {
     Network,
     Images,
     Presentation,
+    Maximize2,
+    Minimize2,
+    Download,
 } from "lucide-react";
+
 import MindMap from "../../components/MindMap";
+import { ReactFlowProvider } from "@xyflow/react";
+
+import { useRef, useState, useEffect } from "react";
+import * as htmlToImage from "html-to-image";
 
 export default function PersonalizedResultPage() {
     const { state } = useLocation();
     const navigate = useNavigate();
 
-    if (!state) {
-        return (
-            <div className="p-10 text-center">
-                <p className="text-gray-600">No data received from server.</p>
-                <button
-                    onClick={() => navigate("/personalize-learning")}
-                    className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
-                >
-                    Go Back
-                </button>
-            </div>
-        );
-    }
+    const fullscreenWrapperRef = useRef(null);
+    const mindmapCaptureRef = useRef(null);
+
+    const [fullscreen, setFullscreen] = useState(false);
+
+    useEffect(() => {
+        const handler = () => {
+            setFullscreen(!!document.fullscreenElement);
+        };
+        document.addEventListener("fullscreenchange", handler);
+        return () => document.removeEventListener("fullscreenchange", handler);
+    }, []);
+
+    const toggleFullscreen = async () => {
+        const el = fullscreenWrapperRef.current;
+        if (!el) return;
+
+        try {
+            if (!document.fullscreenElement) {
+                await el.requestFullscreen();
+            } else {
+                await document.exitFullscreen();
+            }
+        } catch (e) {
+            console.warn("Fullscreen error:", e);
+            setFullscreen((v) => !v);
+        }
+    };
+
+    const downloadMindmap = async () => {
+        try {
+            const dataUrl = await htmlToImage.toPng(mindmapCaptureRef.current, {
+                pixelRatio: 3,
+                cacheBust: true,
+            });
+
+            const link = document.createElement("a");
+            link.href = dataUrl;
+            link.download = `${state?.topic || "mindmap"}.png`;
+            link.click();
+        } catch (err) {
+            console.error("Download failed", err);
+        }
+    };
+
+    if (!state) return <div>No Data</div>;
 
     const {
         textLesson = "",
@@ -34,148 +75,152 @@ export default function PersonalizedResultPage() {
         slides = [],
         images = [],
         interests = [],
-        topic = "Your Personalized Content",
+        topic = "Your Topic",
     } = state;
 
     return (
         <div className="min-h-screen bg-gray-100">
 
-            {/* Top Gradient Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 shadow-md">
-                <div className="flex items-center justify-between max-w-5xl mx-auto">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-white hover:opacity-80 transition"
-                    >
-                        <ArrowLeft size={20} /> Back
-                    </button>
+            {!fullscreen && (
+                // <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 shadow-md">
+                //     <div className="max-w-5xl mx-auto flex justify-between items-center">
+                //         <button
+                //             onClick={() => navigate(-1)}
+                //             className="text-white flex items-center gap-1"
+                //         >
+                //             <ArrowLeft size={18} /> Back
+                //         </button>
 
-                    <h1 className="text-xl font-bold text-white tracking-wide">
-                        Personalized Learning Output
+                //         <h1 className="text-white text-xl font-bold">Personalized Output</h1>
+
+                //         <div></div>
+                //     </div>
+                // </div>
+                <div className="max-w-5xl w-full mx-auto mb-6 flex flex-wrap items-center justify-between gap-4">
+                    <h1 className="text-3xl font-bold text-blue-600 leading-tight">
+                        🎯 Personalized Output
                     </h1>
 
-                    <div></div>
-                </div>
-            </div>
-
-            {/* Page Container */}
-            <div className="max-w-5xl mx-auto p-6 space-y-8">
-
-                {/* Overview Card */}
-                <div className="bg-white p-7 rounded-2xl shadow-lg border">
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-2">
-                        {topic}
-                    </h2>
-                    <p className="text-gray-600 text-sm">
-                        Personalized based on your interests:{" "}
-                        <span className="text-blue-700 font-medium">
-                            {interests.join(", ")}
-                        </span>
-                    </p>
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition font-medium"
+                    >
+                        <ArrowLeft size={20} />
+                        Back
+                    </button>
                 </div>
 
-                {/* Main Content */}
-                <div className="space-y-10">
+            )}
 
-                    {/* Text Lesson */}
+            {!fullscreen && (
+                <div className="max-w-5xl mx-auto p-6 space-y-8">
+
+                    {/* Text */}
                     {textLesson && (
-                        <section className="bg-white p-7 rounded-2xl shadow border">
-                            <div className="flex items-center gap-3 mb-4">
-                                <FileText className="text-indigo-600" size={22} />
-                                <h3 className="text-xl font-semibold text-gray-800">
-                                    Personalized Text Lesson
-                                </h3>
+                        <section className="bg-white p-7 rounded-xl shadow border">
+                            <div className="flex items-center gap-2 mb-3">
+                                <FileText className="text-indigo-600" />
+                                <h2 className="text-lg font-semibold">Text Lesson</h2>
                             </div>
-                            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                                {textLesson}
-                            </p>
+                            <p className="whitespace-pre-line text-gray-700">{textLesson}</p>
                         </section>
                     )}
 
-                    {/* Audio Lesson */}
+                    {/* Audio */}
                     {audioUrl && (
-                        <section className="bg-white p-7 rounded-2xl shadow border">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Mic className="text-green-600" size={22} />
-                                <h3 className="text-xl font-semibold text-gray-800">
-                                    Audio Lesson
-                                </h3>
+                        <section className="bg-white p-7 rounded-xl shadow border">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Mic className="text-green-600" />
+                                <h2 className="text-lg font-semibold">Audio Lesson</h2>
                             </div>
-
-                            <audio controls className="w-full mt-3 rounded-lg">
+                            <audio controls className="w-full">
                                 <source src={audioUrl} type="audio/mpeg" />
                             </audio>
                         </section>
                     )}
 
-                    {/* Mind Map */}
+                    {/* MindMap normal */}
                     {mindmap && (
-                        <section className="bg-white p-7 rounded-2xl shadow border">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Network className="text-blue-600" size={22} />
-                                <h3 className="text-xl font-semibold text-gray-800">
-                                    Mind Map
-                                </h3>
-                            </div>
-                            <div className="bg-gray-50 p-4 rounded-xl border shadow-inner">
-                                <MindMap data={mindmap} />
-                            </div>
-                        </section>
-                    )}
+                        <section className="bg-white p-7 rounded-xl shadow border">
+                            <div className="flex justify-between items-center mb-4">
+                                <div className="flex items-center gap-2">
+                                    <Network className="text-blue-600" />
+                                    <h2 className="text-lg font-semibold">Mind Map</h2>
+                                </div>
 
-                    {/* Slides */}
-                    {slides?.length > 0 && (
-                        <section className="bg-white p-7 rounded-2xl shadow border">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Presentation className="text-yellow-600" size={22} />
-                                <h3 className="text-xl font-semibold text-gray-800">
-                                    Slides
-                                </h3>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                {slides.map((slide, i) => (
-                                    <div
-                                        key={i}
-                                        className="bg-gray-50 rounded-xl p-5 border shadow-sm hover:shadow-md transition"
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        className="p-2 border rounded-lg"
+                                        onClick={downloadMindmap}
                                     >
-                                        <h4 className="font-semibold text-gray-900 text-lg mb-3">
-                                            {slide.title}
-                                        </h4>
-                                        <ul className="text-gray-700 space-y-1 list-disc ml-5">
-                                            {slide.bullets?.map((b, idx) => (
-                                                <li key={idx}>{b}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ))}
+                                        <Download size={18} />
+                                    </button>
+                                    <button
+                                        className="p-2 border rounded-lg"
+                                        onClick={toggleFullscreen}
+                                    >
+                                        <Maximize2 size={18} />
+                                    </button>
+                                </div>
                             </div>
-                        </section>
-                    )}
+                            <div
+                                ref={mindmapCaptureRef}
+                                className="bg-gray-100 p-4 rounded-xl overflow-hidden relative"
+                                style={{ width: "100%", height: "600px" }}
+                            >
 
-                    {/* Images */}
-                    {images?.length > 0 && (
-                        <section className="bg-white p-7 rounded-2xl shadow border">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Images className="text-pink-600" size={22} />
-                                <h3 className="text-xl font-semibold text-gray-800">
-                                    Generated Images
-                                </h3>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                                {images.map((src, i) => (
-                                    <img
-                                        key={i}
-                                        src={src}
-                                        className="rounded-2xl shadow-md border object-cover w-full h-48 hover:shadow-xl transition"
+                                <ReactFlowProvider>
+                                    <MindMap
+                                        data={mindmap}
+                                        fullscreen={false}
                                     />
-                                ))}
+                                </ReactFlowProvider>
                             </div>
+
                         </section>
                     )}
+
                 </div>
-            </div>
+            )}
+
+            {/* FULLSCREEN MODE */}
+            {mindmap && (
+                <div
+                    ref={fullscreenWrapperRef}
+                    className={`fixed inset-0 z-[9999] bg-black/90 ${fullscreen ? "block" : "hidden"}`}
+                >
+                    <div className="flex justify-between items-center p-4 text-white sticky top-0">
+                        <h2 className="font-semibold">{topic}</h2>
+
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={downloadMindmap}
+                                className="p-2 rounded bg-white/20 hover:bg-white/30"
+                            >
+                                <Download size={18} />
+                            </button>
+
+                            <button
+                                onClick={toggleFullscreen}
+                                className="p-2 rounded bg-white/20 hover:bg-white/30"
+                            >
+                                <Minimize2 size={18} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="w-full h-[calc(100vh-70px)] p-4">
+                        <div
+                            ref={mindmapCaptureRef}
+                            className="w-full h-full bg-gray-800 rounded-lg overflow-hidden"
+                        >
+                            <ReactFlowProvider>
+                                <MindMap data={mindmap} fullscreen={true} />
+                            </ReactFlowProvider>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
